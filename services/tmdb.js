@@ -36,6 +36,7 @@ function getMovieCredits(id) {
 function wrapMovieData(details, credits) {
   return {
     title: details.title,
+    movie_id: details.id,
     release_date: details.release_date,
     directors: getDirectors(credits.crew),
     vote_average: details.vote_average.toString(),
