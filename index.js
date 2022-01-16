@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { Client, Intents, MessageEmbed } = require("discord.js")
-const { ADD_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions, readTextFromAttachedFile } = require("./utils")
-const { addMovie, editMovie } = require('./commandHandlers')
+const { CREATE_FILE_REGEX, ADD_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions, readTextFromAttachedFile } = require("./utils")
+const { createEmptyFile, addMovie, editMovie } = require('./commandHandlers')
 const { sendFinalMsg } = require('./channelEditor')
 
 const client = new Client({
@@ -14,22 +14,25 @@ client.on("ready", () => {
   console.log("The bot is ready");
 });
 
+client.on("messageCreate", msg => {
+  if(msg.content.match(CREATE_FILE_REGEX)) {
+    createEmptyFile(msg)
+  }
+})
+
 client.on("messageCreate", (msg) => {
   if (msg.content.includes("testing")) {
-    const realMessage = msg;
+    //const realMessage = msg;
     msg.channel.send('> \*tested correctly\*')
       .then(_msg => {
-        realMessage.delete()
+        msg.delete()
         setTimeout(() => _msg.delete(), 5000)
       })
   } else if (msg.content.match(ADD_MOVIE_REGEX) && hasPermissions(msg.member)) {
-    msg.reply("u want to add movie? LOL");
+    console.log('TRYING TO ADD A MOVIE')
     addMovie(msg)
   } else if (msg.content.match(EDIT_MOVIE_REGEX) && hasPermissions(msg.member)) {
-    msg.reply("u want to edit? LMAO");
     editMovie(msg)
-  } else if (msg.content.includes("file")) {
-    sendFinalMsg(msg)
   } else if (msg.content.includes("attach")) {
     console.log('gettin messages...')
     msg.channel.messages.fetch({limit: 3}).then(data => {
@@ -38,7 +41,6 @@ client.on("messageCreate", (msg) => {
   } else if (msg.content.includes("stack")) {
     readTextFromAttachedFile(msg)
     //uploadTextContent(msg)
-    
   }
 });
 
