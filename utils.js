@@ -2,10 +2,17 @@ const fs = require("fs");
 const { MessageEmbed, Permissions } = require('discord.js');
 const ParseURLException = require('./exceptions/parseUrlException')
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
-const { WriteFileException } = require('./exceptions/handleFileException')
+const { CreateBaseFileException, WriteFileException } = require('./exceptions/fileException')
 
 const ADD_MOVIE_REGEX = /^!addMovie\ +[^0-9].*/im;
 const EDIT_MOVIE_REGEX = /^!editMovie\ +[0-9]+\ +.*/im;
+const CREATE_FILE_REGEX = /^!createEmptyFile\ */im;
+
+const ACTION = {
+  ADD: Symbol('ADD'),
+  EDIT: Symbol('EDIT'),
+  DELETE: Symbol('DELETE')
+}
 
 function getMovieID(commandLine) {
   const singleSpaceText = eliminateSpaces(commandLine)
@@ -51,55 +58,27 @@ function updateMovieLine(newData, commandLine) {
   const newText = wholeText.replace(realRegex, textToWrite)
   console.log('text to write: ' + newText)
   try {
-    fs.writeFileSync('test.txt', newText, 'utf-8');
+    fs.writeFileSync('movies.txt', newText, 'utf-8');
   } catch (err) {
     return err
-  }
-}
-
-
-
-
-
-
-
-
-async function uploadTextContent(message) {
-  // get the file's URL
-  const file = message.attachments.first()?.url;
-  if (!file) return console.log('No attached file found');
-
-  try {
-    message.channel.send('Reading the file! Fetching data...');
-
-    // fetch the file from the external URL
-    const response = await fetch(file);
-
-    // if there was an error send a message with the status
-    if (!response.ok)
-      return message.channel.send(
-        'There was an error with fetching the file:',
-        response.statusText,
-      );
-
-    // take the response stream and read it to completion
-    const text = await response.text();
-
-    if (text) {
-      message.channel.send(`\`\`\`${text}\`\`\``);
-    }
-  } catch (error) {
-    console.log(error);
   }
 }
 
 function readTextFromFile() {
   try {
-    const data = fs.readFileSync('test.txt', 'utf8')
+    const data = fs.readFileSync('movies.txt', 'utf8')
     return data.toString()
   } catch (err) {
     console.error(err)
     return err
+  }
+}
+
+function createBaseFile() {
+  try {
+    fs.closeSync(fs.openSync('./movies.txt', 'w'))
+  } catch {
+    throw new CreateBaseFileException() 
   }
 }
 
@@ -119,10 +98,35 @@ function hasPermissions(member) {
 function createTemporaryMessage(msg, text, time) {
   msg.channel.send(text)
     .then(_msg => {
-      setTimeout(() => {
-        _msg.delete().then(() => msg.delete())
-      }, time)
+      setTimeout(() => { _msg.delete() }, time)
     })
+}
+
+function addSuccessMessage(msg, data, action) {
+  const embed = { color: 0x548f6f }
+  
+  if(action === ACTION.ADD) {
+    embed.description = `Se agregó \_\_${data.title}\_\_ correctamente`
+  } else if (action === ACTION.EDIT) {
+    embed.description = `Nueva película \_\_${data.title}\_\_ se editó correctamente`
+  } else if (action === ACTION.DELETE) {
+    embed.description = `Se borró \_\_${data.title}\_\_ correctamente`
+  }
+
+  //msg.channel.send({embeds: [embed]})
+  msg.channel.send({embeds: [embed]}).then( _msg => {
+    msg.delete()
+    setTimeout(() => {_msg.delete()}, 10000)
+  })
+}
+
+function addFailureMessage(msg, text) {
+  
+  const embed = {
+    color: 0xff0000,
+    description: 'Error: ' + text
+  }
+  return msg.channel.send({ embeds: [embed] })
 }
 
 function createEmbed(msg, movieData) {
@@ -150,11 +154,16 @@ function createEmbed(msg, movieData) {
 module.exports = {
   ADD_MOVIE_REGEX,
   EDIT_MOVIE_REGEX,
+  CREATE_FILE_REGEX,
   getMovieID,
   updateMovieLine,
   hasPermissions,
   lineCount, 
   formatMovieText,
   createEmbed, 
-  createTemporaryMessage
+  createTemporaryMessage,
+  addSuccessMessage,
+  createBaseFile,
+  addFailureMessage,
+  ACTION
 };

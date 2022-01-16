@@ -1,8 +1,8 @@
 const fs = require('fs')
 const {lineCount, formatMovieText, createEmbed, createTemporaryMessage} = require('./utils')
 const { readTextFromAttachedFile } = require('./attachMovieData')
-const { WriteFileException } = require('./exceptions/handleFileException')
-const { AttachedNotFoundException } = require('./exceptions/fileNotFoundException')
+const { AttachedNotFoundException, WriteFileException } = require('./exceptions/fileException')
+const { FetchEmptyFileException } = require('./exceptions/fetchDataException')
 
 async function addMovieToAttachedFile(movieData, message) {
   try {
@@ -11,31 +11,8 @@ async function addMovieToAttachedFile(movieData, message) {
     writeTextToFile(textToWrite)
     sendFinalMsg(message, movieData)
   } catch (error) {
-    createTemporaryMessage(message, error.message, 5000)
     throw error
   }
-  /*
-  const wholeText = await readTextFromAttachedFile(message.channel);
-  
-  let nextLineNumber
-  if(wholeText === ' ') {
-    nextLineNumber = 1
-  } else {
-    nextLineNumber = lineCount(wholeText).toString();
-  }
-  const formattedText = formatMovieText(movieData, nextLineNumber);
-
-  const textToWrite = formattedText + '\n';
-
-  console.log('NEXTLINE: ' + textToWrite);
-  
-  fs.appendFile('test.txt', textToWrite, function (err) {
-    if (err) throw err;
-    console.log('Saved!');
-  });
-
-  sendFinalMsg(message, movieData)
-  */
 }
 
 async function nextMovieLineNumber(message) {
@@ -46,6 +23,8 @@ async function nextMovieLineNumber(message) {
     if(error instanceof AttachedNotFoundException) {
       createTemporaryMessage(message, 'no se encontro un archivo adjunto, creando uno..', 5000)
       return 1 //brand new attach
+    } else if(error instanceof FetchEmptyFileException) {
+      return 1
     } else {
       throw error
     }
@@ -53,7 +32,7 @@ async function nextMovieLineNumber(message) {
 }
 
 function writeTextToFile(textToWrite) {
-  fs.appendFile('test.txt', textToWrite, function (err) {
+  fs.appendFile('movies.txt', textToWrite, function (err) {
     if (err) throw new WriteFileException();
     console.log('Saved!');
   });
@@ -62,7 +41,7 @@ function writeTextToFile(textToWrite) {
 function sendFinalMsg(message, movieData) {
   const embed = createEmbed(message, movieData);
   const text = '\*\*\*movie\*\*\*'
-  message.channel.send({content: text, embeds: [embed], files: ["./test.txt"] });
+  message.channel.send({content: text, embeds: [embed], files: ["./movies.txt"] });
 }
 
 module.exports = { addMovieToAttachedFile, sendFinalMsg }

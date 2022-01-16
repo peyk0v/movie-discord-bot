@@ -14,4 +14,12 @@ class FetchMovieFileException extends Error {
   }
 }
 
-module.exports = { FetchTMDBException, FetchMovieFileException }
+class FetchEmptyFileException extends Error {  
+  constructor () {
+    super('el archivo encontrado esta vacio')
+    this.name = this.constructor.name
+    Error.captureStackTrace(this, this.constructor);
+  }
+}
+
+module.exports = { FetchTMDBException, FetchMovieFileException, FetchEmptyFileException }
