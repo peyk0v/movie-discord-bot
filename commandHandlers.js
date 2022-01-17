@@ -2,7 +2,7 @@ const getMovieData = require('./services/tmdb')
 const { addMovieToAttachedFile } = require('./messages/attachFile')
 const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
-const { saveRawData, updateRawData } = require('./db/db_helpers')
+const { saveRawData, updateRawData, deleteSelectedMovie } = require('./db/db_helpers')
 const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
 const { sendFinalMsg, addFailureMessage, addSuccessMessage } = require('./messages/messages')
 const {
@@ -29,7 +29,17 @@ async function editMovie(msg) {
     const resultObj = await updateRawData(dataToUpdate, msg)
     await overwritePreviousFile(resultObj)
     await updateAttachMsg(msg, dataToUpdate, ACTION.EDIT)
-  } catch(e) {
+  } catch(error) {
+    addFailureMessage(msg, error.message)
+  }
+}
+
+async function deleteMovie(msg) {
+  try {
+    const resultObj = await deleteSelectedMovie(msg)
+    await overwritePreviousFile(resultObj)
+    await updateAttachMsg(msg, resultObj.plus_data, ACTION.DELETE)
+  } catch(error) {
     addFailureMessage(msg, error.message)
   }
 }
@@ -48,4 +58,4 @@ async function createEmptyFile(msg) {
 }
 
 
-module.exports = { addMovie, editMovie, createEmptyFile };
+module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile };

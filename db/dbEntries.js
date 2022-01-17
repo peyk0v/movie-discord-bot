@@ -26,6 +26,14 @@ async function updateMovie(filter, newMovieData) {
   } catch {
     throw new DBException(`error al actualizar la película`)
   }
-} 
+}
 
-module.exports = { saveMovie, getAllMovies, updateMovie }
+async function deleteMovie(filter) {
+  try {
+    return await Movie.deleteOne(filter)
+  } catch {
+    throw new DBException(`error al borrar la pelicula`)
+  }
+}
+
+module.exports = { saveMovie, getAllMovies, updateMovie, deleteMovie }

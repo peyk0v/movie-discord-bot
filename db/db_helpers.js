@@ -1,7 +1,7 @@
 const Movie = require('./schemas/movie')
 const DBException = require('../exceptions/dbException')
-const { formatMovieText, numberLineToEdit } = require('../utils')
-const { saveMovie, getAllMovies, updateMovie } = require('./dbEntries')
+const { formatMovieText, numberLineFromMessage } = require('../utils')
+const { saveMovie, getAllMovies, updateMovie, deleteMovie } = require('./dbEntries')
 
 async function saveRawData(movieData, msg) {
   try {
@@ -23,7 +23,7 @@ async function saveRawData(movieData, msg) {
 async function updateRawData(movieData, msg) {
   try{ 
     const serverId = msg.guild.id
-    const editLine = numberLineToEdit(msg.content)
+    const editLine = numberLineFromMessage(msg.content)
     const filter = { server_id: serverId, line_number: editLine }
     const newLineText = formatMovieText(movieData, editLine);
     const dataToUpdate = fieldsToUpdate(movieData, newLineText)
@@ -32,6 +32,22 @@ async function updateRawData(movieData, msg) {
     return {
       all_movies: allServerMovies,
       plus_data: oldMovieData
+    }
+  } catch(e) {
+    throw e
+  }
+}
+
+async function deleteSelectedMovie(msg) {
+  try {
+    const serverId = msg.guild.id
+    const deleteLine = numberLineFromMessage(msg.content)
+    const filter = { server_id: serverId, line_number: deleteLine }
+    const deletedData = await deleteMovie(filter)
+    const allServerMovies = await getAllMovies(serverId) 
+    return {
+      all_movies : allServerMovies,
+      plus_data: allServerMovies.at(-1)
     }
   } catch(e) {
     throw e
@@ -59,4 +75,14 @@ function fieldsToUpdate(movieData, newText) {
   return newMovie
 }
 
-module.exports = { saveRawData, updateRawData }
+/*function adaptLastMovie(allServerMovies) {
+  let lastMovie = allServerMovies.at(-1)
+  console.log('ULTIMA PELI')
+  console.log(lastMovie)
+  lastMovie.vote_average = lastMovie.vote_average.toString()
+  console.log('ULTIMA PELI renovada')
+  console.log(lastMovie)
+  return lastMovie
+}*/
+
+module.exports = { saveRawData, updateRawData, deleteSelectedMovie }

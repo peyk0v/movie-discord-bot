@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { Client, Intents, MessageEmbed } = require("discord.js")
-const { CREATE_FILE_REGEX, ADD_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions } = require("./utils")
-const { createEmptyFile, addMovie, editMovie } = require('./commandHandlers')
+const { CREATE_FILE_REGEX, ADD_MOVIE_REGEX, DELETE_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions } = require("./utils")
+const { createEmptyFile, addMovie, editMovie, deleteMovie } = require('./commandHandlers')
 const openDatabaseConection = require('./db/mongoose')
 
 const client = new Client({
@@ -32,6 +32,8 @@ client.on("messageCreate", (msg) => {
     addMovie(msg)
   } else if (msg.content.match(EDIT_MOVIE_REGEX) && hasPermissions(msg.member)) {
     editMovie(msg)
+  } else if (msg.content.match(DELETE_MOVIE_REGEX) && hasPermissions(msg.member)) {
+    deleteMovie(msg)
   } else if (msg.content.includes("attach")) {
     console.log('gettin messages...')
     msg.channel.messages.fetch({limit: 3}).then(data => {

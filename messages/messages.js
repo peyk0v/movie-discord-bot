@@ -8,7 +8,7 @@ function addSuccessMessage(msg, { title }, action) {
   } else if (action === ACTION.EDIT) {
     embed.description = `Nueva película \_\_${title}\_\_ se editó correctamente`
   } else if (action === ACTION.DELETE) {
-    embed.description = `Se borró \_\_${title}\_\_ correctamente`
+    embed.description = `La película fue eliminada correctamente`
   } else if (action === ACTION.CREATE_BASE) {
     embed.description = `Archivo base creado correctamente`
   }
@@ -48,7 +48,7 @@ function createEmbed(msg, movieData) {
 	  	{ name: 'Genres', value: movieData.genres.join(', ') },
 	  	{ name: 'director/s', value: movieData.directors.join(', '), inline: true },
 	  	{ name: 'release date', value: movieData.release_date, inline: true },
-      { name: 'vote average', value: movieData.vote_average, inline: true }
+      { name: 'vote average', value: movieData.vote_average.toString(), inline: true }
 	  )
 	  .addField('Inline field title', 'Some value here', true)
 	  .setImage(movieData.image_url)

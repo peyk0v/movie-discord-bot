@@ -1,8 +1,9 @@
 const { Permissions } = require('discord.js');
 const ParseURLException = require('./exceptions/parseUrlException')
 
-const ADD_MOVIE_REGEX = /^!addMovie\ +[^0-9].*/im;
-const EDIT_MOVIE_REGEX = /^!editMovie\ +[0-9]+\ +.*/im;
+const ADD_MOVIE_REGEX = /^!addMovie\ +[^0-9][^\ ]*$/im;
+const EDIT_MOVIE_REGEX = /^!editMovie\ +[0-9]+\ +[^\ ]*$/im;
+const DELETE_MOVIE_REGEX = /^!deleteMovie\ +[0-9]+$/im;
 const CREATE_FILE_REGEX = /^!createEmptyFile\ */im;
 
 const ACTION = {
@@ -47,7 +48,7 @@ async function nextMovieLineNumber(message) {
   }
 }
 
-function numberLineToEdit(commandLine) {
+function numberLineFromMessage(commandLine) {
   const singleSpaceText = eliminateSpaces(commandLine)
   return singleSpaceText.split(/\ /)[1];
 }
@@ -74,11 +75,12 @@ function hasPermissions(member) {
 module.exports = {
   ADD_MOVIE_REGEX,
   EDIT_MOVIE_REGEX,
+  DELETE_MOVIE_REGEX,
   CREATE_FILE_REGEX,
   getMovieID,
   hasPermissions,
   lineCount, 
   formatMovieText,
-  numberLineToEdit,
+  numberLineFromMessage,
   ACTION
 };
