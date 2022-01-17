@@ -1,7 +1,7 @@
 const Movie = require('./schemas/movie')
 const DBException = require('../exceptions/dbException')
-const { formatMovieText } = require('../utils')
-const { saveMovie, getAllMovies } = require('./dbEntries')
+const { formatMovieText, numberLineToEdit } = require('../utils')
+const { saveMovie, getAllMovies, updateMovie } = require('./dbEntries')
 
 async function saveRawData(movieData, msg) {
   try {
@@ -13,7 +13,25 @@ async function saveRawData(movieData, msg) {
     const addedMovie = await saveMovie(newMovie)
     return {
       all_movies: allServerMovies,
-      new_movie: addedMovie
+      plus_data: addedMovie
+    }
+  } catch(e) {
+    throw e
+  }
+}
+
+async function updateRawData(movieData, msg) {
+  try{ 
+    const serverId = msg.guild.id
+    const editLine = numberLineToEdit(msg.content)
+    const filter = { server_id: serverId, line_number: editLine }
+    const newLineText = formatMovieText(movieData, editLine);
+    const dataToUpdate = fieldsToUpdate(movieData, newLineText)
+    const oldMovieData = await updateMovie(filter, dataToUpdate)
+    const allServerMovies = await getAllMovies(serverId)
+    return {
+      all_movies: allServerMovies,
+      plus_data: oldMovieData
     }
   } catch(e) {
     throw e
@@ -29,8 +47,16 @@ function adaptDataToSchema(movieData, text, serverId, lineNumber) {
     line_text: text,
     line_number: lineNumber
   }
-
   return newMovie
 }
 
-module.exports = { saveRawData }
+function fieldsToUpdate(movieData, newText) {
+  const newMovie = {
+    ...movieData,
+    vote_average: Number(movieData.vote_average),
+    line_text: newText
+  }
+  return newMovie
+}
+
+module.exports = { saveRawData, updateRawData }

@@ -19,4 +19,13 @@ async function getAllMovies(serverID) {
     throw new DBException(`error al buscar las peliculas pertenecientes al server`)
   }
 }
-module.exports = { saveMovie, getAllMovies }
+
+async function updateMovie(filter, newMovieData) {
+  try {
+    return await Movie.findOneAndUpdate(filter, newMovieData)
+  } catch {
+    throw new DBException(`error al actualizar la película`)
+  }
+} 
+
+module.exports = { saveMovie, getAllMovies, updateMovie }

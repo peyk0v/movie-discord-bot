@@ -2,12 +2,11 @@ const getMovieData = require('./services/tmdb')
 const { addMovieToAttachedFile } = require('./messages/attachFile')
 const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
-const { saveRawData } = require('./db/db_helpers')
+const { saveRawData, updateRawData } = require('./db/db_helpers')
 const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
 const { sendFinalMsg, addFailureMessage, addSuccessMessage } = require('./messages/messages')
 const {
-  getMovieID, 
-  updateMovieLine,
+  getMovieID,
   ACTION 
 } = require('./utils')
 
@@ -17,7 +16,7 @@ async function addMovie(msg) {
     const data = await getMovieData(movieID)
     const resultObj = await saveRawData(data, msg)
     await overwritePreviousFile(resultObj)
-    await updateAttachMsg(msg, data)
+    await updateAttachMsg(msg, data, ACTION.ADD)
   } catch(error) {
     addFailureMessage(msg, error.message)
   }
@@ -27,11 +26,11 @@ async function editMovie(msg) {
   try {
     const movieID = getMovieID(msg.content)
     const dataToUpdate = await getMovieData(movieID)
-    msg.reply(`TO EDIT: titulo: ${dataToUpdate.title}, director: ${dataToUpdate.director[0]}`)
-    updateMovieLine(dataToUpdate, msg.content)
+    const resultObj = await updateRawData(dataToUpdate, msg)
+    await overwritePreviousFile(resultObj)
+    await updateAttachMsg(msg, dataToUpdate, ACTION.EDIT)
   } catch(e) {
-    msg.reply('NAAA QUE HICISTE CHABON')
-    console.log('ALGO SALIO MAL: ' + e.message)
+    addFailureMessage(msg, error.message)
   }
 }
 

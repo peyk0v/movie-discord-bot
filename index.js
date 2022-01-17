@@ -29,7 +29,6 @@ client.on("messageCreate", (msg) => {
         setTimeout(() => _msg.delete(), 5000)
       })
   } else if (msg.content.match(ADD_MOVIE_REGEX) && hasPermissions(msg.member)) {
-    console.log('TRYING TO ADD A MOVIE')
     addMovie(msg)
   } else if (msg.content.match(EDIT_MOVIE_REGEX) && hasPermissions(msg.member)) {
     editMovie(msg)

@@ -64,12 +64,12 @@ async function getFileText(file) {
   }
 }
 
-async function updateAttachMsg(msg, movieData) {
+async function updateAttachMsg(msg, movieData, action) {
   try {
     const previousMsg = await findPreviousAttach(msg)
     await previousMsg.delete()
     await sendFinalMsg(msg, movieData)
-    addSuccessMessage(msg, movieData, ACTION.ADD)
+    addSuccessMessage(msg, movieData, action)
   } catch(e) {
     throw e
   }

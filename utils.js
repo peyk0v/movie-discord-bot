@@ -47,7 +47,7 @@ async function nextMovieLineNumber(message) {
   }
 }
 
-function movieLine(commandLine) {
+function numberLineToEdit(commandLine) {
   const singleSpaceText = eliminateSpaces(commandLine)
   return singleSpaceText.split(/\ /)[1];
 }
@@ -79,5 +79,6 @@ module.exports = {
   hasPermissions,
   lineCount, 
   formatMovieText,
+  numberLineToEdit,
   ACTION
 };
