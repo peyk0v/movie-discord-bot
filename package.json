@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "npm index.js",
-    "dev": "nodemon index.js"
+    "start": "NODE_ENV=production npm index.js",
+    "dev": "NODE_ENV=development nodemon index.js"
   },
   "keywords": [],
   "author": "",
