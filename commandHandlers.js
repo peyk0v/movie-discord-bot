@@ -1,15 +1,13 @@
 const getMovieData = require('./services/tmdb')
-const { addMovieToAttachedFile } = require('./channelEditor')
+const { addMovieToAttachedFile } = require('./messages/attachFile')
 const { BaseFileExistsException } = require('./exceptions/fileException')
-const { movieFileAlreadyExits } = require('./attachMovieData')
+const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
+const { saveRawData } = require('./db/db_helpers')
+const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
+const { sendFinalMsg, addFailureMessage, addSuccessMessage } = require('./messages/messages')
 const {
   getMovieID, 
-  editMovieLine, 
-  updateMovieLine, 
-  createTemporaryMessage, 
-  addSuccessMessage,
-  createBaseFile,
-  addFailureMessage,
+  updateMovieLine,
   ACTION 
 } = require('./utils')
 
@@ -17,11 +15,12 @@ async function addMovie(msg) {
   try {
     const movieID = getMovieID(msg.content)
     const data = await getMovieData(movieID)
-    await addMovieToAttachedFile(data, msg)
-    addSuccessMessage(msg, data, ACTION.ADD)
+    const resultObj = await saveRawData(data, msg)
+    await overwritePreviousFile(resultObj)
+    await updateAttachMsg(msg, data)
   } catch(error) {
     addFailureMessage(msg, error.message)
-  } 
+  }
 }
 
 async function editMovie(msg) {
@@ -41,8 +40,9 @@ async function createEmptyFile(msg) {
     if(await movieFileAlreadyExits(msg.channel)) {
       throw new BaseFileExistsException()
     }
-    createBaseFile()
-    msg.channel.send({ content:'***movies***', files: ['./movies.txt']  })
+    writeTextToFile('(∩ᵔ-ᵔ)⊃━☆ﾟ.mOvIeS eMpTy*･｡ﾟ')
+    await msg.channel.send({ content:'***movies***', files: ['./movie_file/movies.txt']  })
+    addSuccessMessage(msg, {title: 'none'} , ACTION.CREATE_BASE)    
   } catch (error) {
     addFailureMessage(msg, error.message)
   }
