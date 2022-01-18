@@ -1,7 +1,7 @@
 require('dotenv').config()
 const { Client, Intents, MessageEmbed } = require("discord.js")
-const { CREATE_FILE_REGEX, ADD_MOVIE_REGEX, DELETE_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions } = require("./utils")
-const { createEmptyFile, addMovie, editMovie, deleteMovie } = require('./commandHandlers')
+const { CREATE_FILE_REGEX, ADD_MOVIE_REGEX, DELETE_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions, LIST_ROLES } = require("./utils")
+const { createEmptyFile, addMovie, editMovie, deleteMovie, listRoles } = require('./commandHandlers')
 const openDatabaseConection = require('./db/mongoose')
 
 const client = new Client({
@@ -23,22 +23,29 @@ client.on("messageCreate", msg => {
 
 client.on("messageCreate", (msg) => {
   if (msg.content.includes("testing")) {
-    msg.channel.send('> \*tested correctly\*')
-      .then(_msg => {
-        msg.delete()
-        setTimeout(() => _msg.delete(), 5000)
-      })
+    //console.log(msg.guild.channels.commands)
+   /*console.log('GUILD')
+    console.log(msg.guild)
+    console.log('CACHE')
+    msg.guild.channels.cache.each(c => {
+      if(c.isText()) {
+        console.log(c.id)
+        console.log(c.name)
+      }
+    })*/
+    //console.log(msg.guild.channels.cache.values())
+    console.log('ROLES DEL SV')
+    console.log(msg.guild.roles.cache.values())
+    console.log('ROLES DEL USUARIO')
+    console.log(msg.member.roles.cache)
   } else if (msg.content.match(ADD_MOVIE_REGEX) && hasPermissions(msg.member)) {
     addMovie(msg)
   } else if (msg.content.match(EDIT_MOVIE_REGEX) && hasPermissions(msg.member)) {
     editMovie(msg)
   } else if (msg.content.match(DELETE_MOVIE_REGEX) && hasPermissions(msg.member)) {
     deleteMovie(msg)
-  } else if (msg.content.includes("attach")) {
-    console.log('gettin messages...')
-    msg.channel.messages.fetch({limit: 3}).then(data => {
-      console.log(data)
-    }).catch(e => console.log(e.messages))
+  } else if(msg.content.match(LIST_ROLES) && hasPermissions(msg.member)) {
+    listRoles(msg)
   }
 });
 

@@ -62,6 +62,19 @@ function createEmbed(msg, movieData) {
   return embed
 }
 
+function createRolesText(roles) {
+  //[{name, id, index}]
+  let text = 'Los roles disponibles son los siguientes: \n'
+  for(let role of roles) {
+    text = text.concat('***' + role.index + '***' + ' ' + role.name + '\n')
+  }
+  text = text.concat(
+    '\n Para agregar un rol que pueda manejar el bot use !addPermissionRole ***NUMERO***'
+    + '\n Para remover un rol que pueda manejar el bot use !removePermissionRole ***NUMERO***'
+    )
+  return text
+}
+
 function sendFinalMsg(message, movieData) {
   const embed = createEmbed(message, movieData);
   const text = '\*\*\*movie\*\*\*'
@@ -72,5 +85,6 @@ module.exports = {
   addSuccessMessage,
   addFailureMessage,
   createTemporaryMessage,
+  createRolesText,
   sendFinalMsg
 }

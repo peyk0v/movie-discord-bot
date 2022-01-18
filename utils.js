@@ -5,6 +5,9 @@ const ADD_MOVIE_REGEX = /^!addMovie\ +[^0-9][^\ ]*$/im;
 const EDIT_MOVIE_REGEX = /^!editMovie\ +[0-9]+\ +[^\ ]*$/im;
 const DELETE_MOVIE_REGEX = /^!deleteMovie\ +[0-9]+$/im;
 const CREATE_FILE_REGEX = /^!createEmptyFile\ */im;
+const LIST_ROLES = /^!listRoles\ */im
+const ADD_PERMISSION_ROLE = /^!addPermissionRole\ +[0-9]+$/im
+const REMOVE_PERMISSION_ROLE = /^!removePermissionRole\ +[0-9]+$/im
 
 const ACTION = {
   ADD: Symbol('ADD'),
@@ -79,16 +82,30 @@ function joinTextWithIndex(moviesText) {
   return text
 }
 
+function serverRoles(server) {
+  let roles = []
+  let index = 1
+  server.roles.cache.each(role => {
+    roles.push({ name: role.name, id: role.id, index: index })
+    index++
+  })
+  return roles
+}
+
 module.exports = {
   ADD_MOVIE_REGEX,
   EDIT_MOVIE_REGEX,
   DELETE_MOVIE_REGEX,
   CREATE_FILE_REGEX,
+  LIST_ROLES,
+  ADD_PERMISSION_ROLE,
+  REMOVE_PERMISSION_ROLE,
   getMovieID,
   hasPermissions,
   lineCount, 
   formatMovieText,
   numberLineFromMessage,
   joinTextWithIndex,
+  serverRoles,
   ACTION
 };

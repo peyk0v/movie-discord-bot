@@ -4,10 +4,11 @@ const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
 const { saveRawData, updateRawData, deleteSelectedMovie } = require('./db/db_helpers')
 const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
-const { sendFinalMsg, addFailureMessage, addSuccessMessage } = require('./messages/messages')
+const { sendFinalMsg, addFailureMessage, addSuccessMessage, createRolesText } = require('./messages/messages')
 const {
   getMovieID,
-  ACTION 
+  ACTION,
+  serverRoles
 } = require('./utils')
 
 async function addMovie(msg) {
@@ -52,6 +53,12 @@ async function createEmptyFile(msg) {
   }
 }
 
+async function listRoles(msg) {
+  const roles = serverRoles(msg.guild)
+  const text = createRolesText(roles)
+  msg.channel.send({ embeds: [{ color: 0x548f6f, description: text }]})
+}
+
 async function getData(content) {
   try {
     const movieID = getMovieID(content)
@@ -70,4 +77,4 @@ async function updateServerData(msg, data, result, action) {
   }
 }
 
-module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile };
+module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile, listRoles };
