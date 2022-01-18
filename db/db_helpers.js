@@ -7,8 +7,7 @@ async function saveRawData(movieData, msg) {
   try {
     const serverId = msg.guild.id
     const allServerMovies = await getAllMovies(serverId)
-    const textToWrite = formatMovieText(movieData);
-    const newMovie = adaptDataToSchema(movieData, textToWrite, serverId)
+    const newMovie = adaptDataToSchema(movieData, serverId)
     const addedMovie = await saveMovie(newMovie)
     return {
       all_movies: allServerMovies,
@@ -19,6 +18,27 @@ async function saveRawData(movieData, msg) {
   }
 }
 
+async function updateRawData(newData, msg) {
+  try {
+    const serverId = msg.guild.id
+    let allServerMovies = await getAllMovies(serverId)
+    const editLine = numberLineFromMessage(msg.content)
+    if(editLine <= 0 || editLine > allServerMovies.length) {
+      throw new Error('el numero de linea a editar no es valido')
+    }
+    const dataToEdit = allServerMovies[editLine - 1]
+    const adaptedNewData = fieldsToUpdate(newData)
+    const result = await updateMovie({_id: dataToEdit._id}, adaptedNewData)
+    allServerMovies[editLine - 1] = result
+    return {
+      all_movies: allServerMovies,
+      plus_data: dataToEdit
+    }
+  } catch(e) {
+    throw e
+  }
+}
+/*
 async function updateRawData(movieData, msg) {
   try{ 
     const serverId = msg.guild.id
@@ -36,6 +56,7 @@ async function updateRawData(movieData, msg) {
     throw e
   }
 }
+*/
 
 async function deleteSelectedMovie(msg) {
   try {
@@ -53,7 +74,8 @@ async function deleteSelectedMovie(msg) {
   }
 }
 
-function adaptDataToSchema(movieData, text, serverId) {
+function adaptDataToSchema(movieData, serverId) {
+  const text = formatMovieText(movieData);
   const newMovie = {
     ...movieData, 
     vote_average: Number(movieData.vote_average),
@@ -64,7 +86,8 @@ function adaptDataToSchema(movieData, text, serverId) {
   return newMovie
 }
 
-function fieldsToUpdate(movieData, newText) {
+function fieldsToUpdate(movieData) {
+  const newText = formatMovieText(movieData)
   const newMovie = {
     ...movieData,
     vote_average: Number(movieData.vote_average),
@@ -72,15 +95,5 @@ function fieldsToUpdate(movieData, newText) {
   }
   return newMovie
 }
-
-/*function adaptLastMovie(allServerMovies) {
-  let lastMovie = allServerMovies.at(-1)
-  console.log('ULTIMA PELI')
-  console.log(lastMovie)
-  lastMovie.vote_average = lastMovie.vote_average.toString()
-  console.log('ULTIMA PELI renovada')
-  console.log(lastMovie)
-  return lastMovie
-}*/
 
 module.exports = { saveRawData, updateRawData, deleteSelectedMovie }

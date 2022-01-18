@@ -2,9 +2,8 @@ const Movie = require('./schemas/movie')
 const DBException = require('../exceptions/dbException')
 
 async function saveMovie(movieData) {
-  const newMovie = new Movie(movieData)
-
   try {
+    const newMovie = new Movie(movieData)
     const response = await newMovie.save()
     return response
   } catch {
@@ -22,8 +21,8 @@ async function getAllMovies(serverID) {
 
 async function updateMovie(filter, newMovieData) {
   try {
-    return await Movie.findOneAndUpdate(filter, newMovieData)
-  } catch {
+    return await Movie.findOneAndUpdate(filter, newMovieData, { new: true })
+  } catch(e) {
     throw new DBException(`error al actualizar la película`)
   }
 }
