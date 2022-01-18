@@ -15,7 +15,7 @@ async function addMovie(msg) {
     const movieID = getMovieID(msg.content)
     const data = await getMovieData(movieID)
     const resultObj = await saveRawData(data, msg)
-    await overwritePreviousFile(resultObj)
+    await overwritePreviousFile(resultObj, ACTION.ADD)
     await updateAttachMsg(msg, data, ACTION.ADD)
   } catch(error) {
     addFailureMessage(msg, error.message)
@@ -27,7 +27,7 @@ async function editMovie(msg) {
     const movieID = getMovieID(msg.content)
     const dataToUpdate = await getMovieData(movieID)
     const resultObj = await updateRawData(dataToUpdate, msg)
-    await overwritePreviousFile(resultObj)
+    await overwritePreviousFile(resultObj, ACTION.EDIT)
     await updateAttachMsg(msg, dataToUpdate, ACTION.EDIT)
   } catch(error) {
     addFailureMessage(msg, error.message)
@@ -37,7 +37,7 @@ async function editMovie(msg) {
 async function deleteMovie(msg) {
   try {
     const resultObj = await deleteSelectedMovie(msg)
-    await overwritePreviousFile(resultObj)
+    await overwritePreviousFile(resultObj, ACTION.DELETE)
     await updateAttachMsg(msg, resultObj.plus_data, ACTION.DELETE)
   } catch(error) {
     addFailureMessage(msg, error.message)

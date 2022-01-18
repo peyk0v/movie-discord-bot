@@ -7,9 +7,8 @@ async function saveRawData(movieData, msg) {
   try {
     const serverId = msg.guild.id
     const allServerMovies = await getAllMovies(serverId)
-    const nextLineNumber = allServerMovies.length + 1
-    const textToWrite = formatMovieText(movieData, nextLineNumber);
-    const newMovie = adaptDataToSchema(movieData, textToWrite, serverId, nextLineNumber)
+    const textToWrite = formatMovieText(movieData);
+    const newMovie = adaptDataToSchema(movieData, textToWrite, serverId)
     const addedMovie = await saveMovie(newMovie)
     return {
       all_movies: allServerMovies,
@@ -54,14 +53,13 @@ async function deleteSelectedMovie(msg) {
   }
 }
 
-function adaptDataToSchema(movieData, text, serverId, lineNumber) {
+function adaptDataToSchema(movieData, text, serverId) {
   const newMovie = {
     ...movieData, 
     vote_average: Number(movieData.vote_average),
     server_id: serverId,
     seen_date: new Date(),
-    line_text: text,
-    line_number: lineNumber
+    line_text: text
   }
   return newMovie
 }

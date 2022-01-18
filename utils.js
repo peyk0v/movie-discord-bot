@@ -61,16 +61,23 @@ function lineCount(text) {
   return text.split(/[0-9]+\./).length
 }
 
-function formatMovieText(movieData, lineNumber) {
+function formatMovieText(movieData) {
   const year = movieData.release_date.split("-")[0];
-  return lineNumber + '. ' + movieData.title + " " + "(" + year + ")" + " - " + movieData.main_director.name;
+  return movieData.title + " " + "(" + year + ")" + " - " + movieData.main_director.name;
 }
 
 function hasPermissions(member) {
   return member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
 }
 
-
+function joinTextWithIndex(moviesText) {
+  let text = ''
+  moviesText.forEach((movie, index) => {
+    const _index = (index + 1).toString()
+    text = text.concat(_index + '. ' + movie + '\n')
+  })
+  return text
+}
 
 module.exports = {
   ADD_MOVIE_REGEX,
@@ -82,5 +89,6 @@ module.exports = {
   lineCount, 
   formatMovieText,
   numberLineFromMessage,
+  joinTextWithIndex,
   ACTION
 };

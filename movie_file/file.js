@@ -1,6 +1,6 @@
 const fs = require("fs");
 const { CreateBaseFileException, WriteFileException } = require('../exceptions/fileException')
-const { ACTION } = require('../utils') 
+const { ACTION, joinTextWithIndex } = require('../utils') 
 
 function readTextFromFile() {
   try {
@@ -22,11 +22,11 @@ function createBaseFile() {
 
 async function overwritePreviousFile(movieObj, action) {
   try {
-    const allMovies = movieObj.all_movies.map(movie => movie.line_text)
+    let allMoviesText = movieObj.all_movies.map(movie => movie.line_text)
     if(action === ACTION.ADD) {
-      allMovies.push(movieObj.plus_data.line_text)
+      allMoviesText.push(movieObj.plus_data.line_text)
     }
-    const text = allMovies.join('\n')
+    const text = joinTextWithIndex(allMoviesText)
     writeTextToFile(text)
   } catch(e) {
     throw e
