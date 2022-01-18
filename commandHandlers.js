@@ -15,8 +15,6 @@ async function addMovie(msg) {
     const data = await getData(msg.content)
     const result = await saveRawData(data, msg)
     await updateServerData(msg, data, result, ACTION.ADD)
-    //await overwritePreviousFile(resultObj, ACTION.ADD)
-    //await updateAttachMsg(msg, data, ACTION.ADD)
   } catch(error) {
     addFailureMessage(msg, error.message)
   }

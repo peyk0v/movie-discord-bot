@@ -1,12 +1,12 @@
 const { MessageEmbed } = require('discord.js')
 const { ACTION } = require('../utils')
 
-function addSuccessMessage(msg, { title }, action) {
+function addSuccessMessage(msg, movie, action) {
   const embed = { color: 0x548f6f }
   if(action === ACTION.ADD) {
-    embed.description = `Se agregó \_\_${title}\_\_ correctamente`
+    embed.description = `Se agregó \_\_${movie.title}\_\_ correctamente`
   } else if (action === ACTION.EDIT) {
-    embed.description = `Nueva película \_\_${title}\_\_ se editó correctamente`
+    embed.description = `Nueva película \_\_${movie.title}\_\_ se editó correctamente`
   } else if (action === ACTION.DELETE) {
     embed.description = `La película fue eliminada correctamente`
   } else if (action === ACTION.CREATE_BASE) {
@@ -37,6 +37,10 @@ function createTemporaryMessage(msg, text, time) {
 }
 
 function createEmbed(msg, movieData) {
+  if(movieData === undefined) {
+    return { color: 0x548f6f, description: 'no hay películas' }
+  }
+
   const embed = new MessageEmbed()
 	  .setColor('#548f6f')
 	  .setTitle(movieData.title)

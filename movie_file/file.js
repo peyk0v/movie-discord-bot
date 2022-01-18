@@ -22,11 +22,11 @@ function createBaseFile() {
 
 async function overwritePreviousFile(movieObj, action) {
   try {
-    let allMoviesText = movieObj.all_movies.map(movie => movie.line_text)
-    if(action === ACTION.ADD) {
-      allMoviesText.push(movieObj.plus_data.line_text)
+    let text = '(∩ᵔ-ᵔ)⊃━☆ﾟ.mOvIeS: eMpTy*･｡ﾟ'
+    if(movieObj.all_movies.length > 0) {
+      const allMoviesText = movieObj.all_movies.map(movie => movie.line_text)
+      text = joinTextWithIndex(allMoviesText)
     }
-    const text = joinTextWithIndex(allMoviesText)
     writeTextToFile(text)
   } catch(e) {
     throw e
