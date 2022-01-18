@@ -12,11 +12,11 @@ const {
 
 async function addMovie(msg) {
   try {
-    const movieID = getMovieID(msg.content)
-    const data = await getMovieData(movieID)
-    const resultObj = await saveRawData(data, msg)
-    await overwritePreviousFile(resultObj, ACTION.ADD)
-    await updateAttachMsg(msg, data, ACTION.ADD)
+    const data = await getData(msg.content)
+    const result = await saveRawData(data, msg)
+    await updateServerData(msg, data, result, ACTION.ADD)
+    //await overwritePreviousFile(resultObj, ACTION.ADD)
+    //await updateAttachMsg(msg, data, ACTION.ADD)
   } catch(error) {
     addFailureMessage(msg, error.message)
   }
@@ -24,11 +24,9 @@ async function addMovie(msg) {
 
 async function editMovie(msg) {
   try {
-    const movieID = getMovieID(msg.content)
-    const dataToUpdate = await getMovieData(movieID)
-    const resultObj = await updateRawData(dataToUpdate, msg)
-    await overwritePreviousFile(resultObj, ACTION.EDIT)
-    await updateAttachMsg(msg, dataToUpdate, ACTION.EDIT)
+    const data = await getData(msg.content)
+    const result = await updateRawData(data, msg)
+    await updateServerData(msg, data, result, ACTION.EDIT)
   } catch(error) {
     addFailureMessage(msg, error.message)
   }
@@ -36,9 +34,8 @@ async function editMovie(msg) {
 
 async function deleteMovie(msg) {
   try {
-    const resultObj = await deleteSelectedMovie(msg)
-    await overwritePreviousFile(resultObj, ACTION.DELETE)
-    await updateAttachMsg(msg, resultObj.plus_data, ACTION.DELETE)
+    const result = await deleteSelectedMovie(msg)
+    await updateServerData(msg, result.plus_data, result, ACTION.DELETE)
   } catch(error) {
     addFailureMessage(msg, error.message)
   }
@@ -49,7 +46,7 @@ async function createEmptyFile(msg) {
     if(await movieFileAlreadyExits(msg.channel)) {
       throw new BaseFileExistsException()
     }
-    writeTextToFile('(∩ᵔ-ᵔ)⊃━☆ﾟ.mOvIeS eMpTy*･｡ﾟ')
+    writeTextToFile('(∩ᵔ-ᵔ)⊃━☆ﾟ.mOvIeS: eMpTy*･｡ﾟ')
     await msg.channel.send({ content:'***movies***', files: ['./movie_file/movies.txt']  })
     addSuccessMessage(msg, {title: 'none'} , ACTION.CREATE_BASE)    
   } catch (error) {
@@ -57,5 +54,22 @@ async function createEmptyFile(msg) {
   }
 }
 
+async function getData(content) {
+  try {
+    const movieID = getMovieID(content)
+    return await getMovieData(movieID)
+  } catch (e) {
+    throw e
+  }
+}
+
+async function updateServerData(msg, data, result, action) {
+  try {
+    await overwritePreviousFile(result, action)
+    await updateAttachMsg(msg, data, action)
+  } catch(e) {
+    throw e
+  }
+}
 
 module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile };
