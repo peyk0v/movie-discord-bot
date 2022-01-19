@@ -1,8 +1,9 @@
 const getMovieData = require('./services/tmdb')
 const { addMovieToAttachedFile } = require('./messages/attachFile')
+const PermissionException = require('./exceptions/permissionException')
 const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
-const { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles} = require('./db/db_helpers')
+const { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles, hasPermissions } = require('./db/db_helpers')
 const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
 const { sendFinalMsg, addFailureMessage, addSuccessMessage, formatRolesText, createRoleEmbedText } = require('./messages/messages')
 const {
@@ -14,6 +15,7 @@ const {
 
 async function addMovie(msg) {
   try {
+    await checkForPermissions(msg)
     const data = await getData(msg.content)
     const result = await saveRawData(data, msg)
     await updateServerData(msg, data, result, ACTION.ADD)
@@ -24,6 +26,7 @@ async function addMovie(msg) {
 
 async function editMovie(msg) {
   try {
+    await checkForPermissions(msg)
     const data = await getData(msg.content)
     const result = await updateRawData(data, msg)
     await updateServerData(msg, data, result, ACTION.EDIT)
@@ -34,6 +37,7 @@ async function editMovie(msg) {
 
 async function deleteMovie(msg) {
   try {
+    await checkForPermissions(msg)
     const result = await deleteSelectedMovie(msg)
     await updateServerData(msg, result.plus_data, result, ACTION.DELETE)
   } catch(error) {
@@ -43,6 +47,7 @@ async function deleteMovie(msg) {
 
 async function createEmptyFile(msg) {
   try {
+    await checkForPermissions(msg)
     if(await movieFileAlreadyExits(msg.channel)) {
       throw new BaseFileExistsException()
     }
@@ -56,6 +61,7 @@ async function createEmptyFile(msg) {
 
 async function listRoles(msg) {
   try {
+    await checkForPermissions(msg)
     const roles = serverRoles(msg.guild)
     const savedRoles = await getSavedRoles(msg)
     const text = formatRolesText(roles, savedRoles)
@@ -68,6 +74,7 @@ async function listRoles(msg) {
 
 async function addPermisionRole(msg) {
   try{
+    await checkForPermissions(msg)
     const data = getRoleData(msg)
     await savePermissionRole(data, msg.guild.id)
     addSuccessMessage(msg, {title: data.name}, ACTION.ADD_ROLE) 
@@ -78,6 +85,7 @@ async function addPermisionRole(msg) {
 
 async function removePermissionRole(msg) {
   try {
+    await checkForPermissions(msg)
     const data = getRoleData(msg)
     await deletePermissionRole(data, msg.guild.id)
     addSuccessMessage(msg, { title: data.name }, ACTION.REMOVE_ROLE)
@@ -114,6 +122,14 @@ async function updateServerData(msg, data, result, action) {
     await updateAttachMsg(msg, data, action)
   } catch(e) {
     throw e
+  }
+}
+
+async function checkForPermissions(msg) {
+  if(await hasPermissions(msg)){
+    return true
+  } else {
+    throw new PermissionException()
   }
 }
 

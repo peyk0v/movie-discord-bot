@@ -1,4 +1,5 @@
 const Movie = require('./schemas/movie')
+const { Permissions } = require('discord.js');
 const DBException = require('../exceptions/dbException')
 const { formatMovieText, numberLineFromMessage } = require('../utils')
 const { saveMovie, getAllMovies, updateMovie, deleteMovie, saveRole, deleteRole, getAllRoles } = require('./dbEntries')
@@ -99,4 +100,22 @@ function fieldsToUpdate(movieData) {
   return newMovie
 }
 
-module.exports = { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles }
+async function hasPermissions(msg) {
+  try {
+    const isAdmin = msg.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
+    const savedRoles = await getSavedRoles(msg)
+    const savedRolesID = savedRoles.map(role => role.id)
+    const userRoles = msg.member.roles.cache.map(role => role.id)
+    let hasRolePermission = false
+    for(let savedRole of savedRolesID) {
+      if(userRoles.includes(savedRole)) {
+        hasRolePermission = true
+      }
+    }
+    return hasRolePermission || isAdmin
+  } catch(e) {
+    throw e
+  }
+}
+
+module.exports = { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles, hasPermissions }
