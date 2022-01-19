@@ -1,17 +1,19 @@
 const getMovieData = require('./services/tmdb')
-const { addMovieToAttachedFile } = require('./messages/attachFile')
 const PermissionException = require('./exceptions/permissionException')
 const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
-const { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles, hasPermissions } = require('./db/db_helpers')
-const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
-const { sendFinalMsg, addFailureMessage, addSuccessMessage, formatRolesText, createRoleEmbedText } = require('./messages/messages')
-const {
-  getMovieID,
-  ACTION,
-  serverRoles,
-  numberLineFromMessage
-} = require('./utils')
+const { overwritePreviousFile, writeTextToFile } = require('./movie_file/file')
+const { getMovieID, ACTION, serverRoles, numberLineFromMessage } = require('./utils')
+const { addFailureMessage, addSuccessMessage, formatRolesText, createRoleEmbedText } = require('./messages/messages')
+const { 
+  saveRawData, 
+  updateRawData, 
+  deleteSelectedMovie, 
+  savePermissionRole, 
+  deletePermissionRole, 
+  getSavedRoles, 
+  hasPermissions 
+} = require('./db/db_helpers')
 
 async function addMovie(msg) {
   try {
@@ -69,7 +71,6 @@ async function listRoles(msg) {
   } catch(error) {
     addFailureMessage(msg, error.message)
   }
-  
 }
 
 async function addPermisionRole(msg) {

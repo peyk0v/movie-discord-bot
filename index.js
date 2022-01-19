@@ -1,8 +1,17 @@
 require('dotenv').config()
-const { Client, Intents, MessageEmbed } = require("discord.js")
+const { Client, Intents } = require("discord.js")
 const { COMMAND_REGEX } = require("./utils")
-const { createEmptyFile, addMovie, editMovie, deleteMovie, listRoles, addPermisionRole, removePermissionRole } = require('./commandHandlers')
 const openDatabaseConection = require('./db/mongoose')
+const { 
+  createEmptyFile, 
+  addMovie, 
+  editMovie, 
+  deleteMovie, 
+  listRoles, 
+  addPermisionRole, 
+  removePermissionRole 
+} = require('./commandHandlers')
+
 
 const client = new Client({
   intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES],
@@ -15,15 +24,9 @@ client.on("ready", () => {
   console.log("The bot is ready");
 });
 
-client.on("messageCreate", msg => {
-  if(msg.content.match(CREATE_FILE_REGEX)) {
-    createEmptyFile(msg)
-  }
-})
-
 client.on("messageCreate", (msg) => {
-  if (msg.content.includes("testing")) {
-    //console.log(msg.member.roles.cache.hasAny())
+  if(msg.content.match(COMMAND_REGEX.CREATE_FILE)) {
+    createEmptyFile(msg)
   } else if (msg.content.match(COMMAND_REGEX.ADD_MOVIE)) {
     addMovie(msg)
   } else if (msg.content.match(COMMAND_REGEX.EDIT_MOVIE)) {
@@ -36,14 +39,5 @@ client.on("messageCreate", (msg) => {
     addPermisionRole(msg)
   } else if(msg.content.match(COMMAND_REGEX.REMOVE_PERMISSION_ROLE)) {
     removePermissionRole(msg)
-  }
-});
-
-client.on("messageCreate", (msg) => {
-  if (msg.content.toLowerCase().startsWith("!clearchat")) {
-    msg.channel
-      .bulkDelete(20)
-      .then((messages) => console.log(`Bulk deleted ${messages.size} messages`))
-      .catch(console.error);
   }
 });

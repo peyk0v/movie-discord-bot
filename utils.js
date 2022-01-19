@@ -40,22 +40,6 @@ function getMovieID(commandLine) {
   }
 }
 
-async function nextMovieLineNumber(message) {
-  try {
-    const wholeText = await readTextFromAttachedFile(message.channel);
-    return lineCount(wholeText);
-  } catch (error) {
-    if(error instanceof AttachedNotFoundException) {
-      createTemporaryMessage(message, 'no se encontro un archivo adjunto, creando uno..', 5000)
-      return 1 //brand new attach
-    } else if(error instanceof FetchEmptyFileException) {
-      return 1
-    } else {
-      throw error
-    }
-  }
-}
-
 function numberLineFromMessage(commandLine) {
   const singleSpaceText = eliminateSpaces(commandLine)
   return singleSpaceText.split(/\ /)[1];
@@ -95,11 +79,11 @@ function serverRoles(server) {
 
 module.exports = {
   COMMAND_REGEX,
+  ACTION,
   getMovieID,
   lineCount, 
   formatMovieText,
   numberLineFromMessage,
   joinTextWithIndex,
-  serverRoles,
-  ACTION
+  serverRoles
 };

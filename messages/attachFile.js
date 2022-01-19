@@ -1,38 +1,11 @@
 const node_fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 const { AttachedNotFoundException, MovieFileAttachException } = require('../exceptions/fileException')
-const { FetchMovieFileException, FetchEmptyFileException } = require('../exceptions/fetchDataException')
+const { FetchMovieFileException } = require('../exceptions/fetchDataException')
 const { overwritePreviousFile } = require('../movie_file/file');
 const { sendFinalMsg, addSuccessMessage } = require('./messages');
 const { ACTION } = require('../utils')
 
 const ATTACHED_FILE_MESSAGE = /\*\*\*.*\*\*\*/im;
-
-async function addMovieToAttachedFile(moviesObj, message) {
-  try {
-    //moviesObj <-- todas las pelis y la nueva
-    sendFinalMsg(message, movieData.new_movie)
-  } catch (error) {
-    throw error
-  }
-}
-
-/*
-async function readTextFromAttachedFile(channel) {
-  const attachedMessages = await filterAttachedMessages(channel)
-  if(attachedMessages.length === 0) {
-    throw new AttachedNotFoundException()
-  }
-  const movieUrl = getAttachFileURL(attachedMessages)
-  if(!movieUrl) {
-    throw new MovieFileAttachException()
-  };
-  const text = await getFileText(movieUrl)
-  if(text) {
-    return text
-  } else {
-    throw new FetchEmptyFileException()
-  }
-}*/
 
 function getAttachFileURL(attachedMessages) {
   for(let message of attachedMessages) {
@@ -74,21 +47,6 @@ async function updateAttachMsg(msg, movieData, action) {
     throw e
   }
 }
-/*
-async function updateAttachMsg(msg, movieData) {
-  try {
-    const previousMsg = await findPreviousAttach(msg)
-    await previousMsg.delete()
-      .then(() => {
-        sendFinalMsg(msg, movieData)
-          .then(() => {
-            addSuccessMessage(msg, movieData, ACTION.ADD)
-          })
-      })
-  } catch(e) {
-    throw e
-  }
-}*/
 
 async function findPreviousAttach(msg) {
   const attachedMessages = await filterAttachedMessages(msg.channel)
@@ -123,4 +81,4 @@ function getLastMovieAttach(attachedMessages) {
   }
 }
 
-module.exports = { addMovieToAttachedFile, movieFileAlreadyExits, updateAttachMsg }
+module.exports = { movieFileAlreadyExits, updateAttachMsg }
