@@ -1,6 +1,4 @@
-const { Permissions } = require('discord.js');
 const ParseURLException = require('./exceptions/parseUrlException')
-const { getSavedRoles } = require('./db/db_helpers');
 
 const COMMAND_REGEX = {
   ADD_MOVIE: /^!addMovie\ +[^0-9][^\ ]*$/im,
@@ -76,20 +74,6 @@ function formatMovieText(movieData) {
   return movieData.title + " " + "(" + year + ")" + " - " + movieData.main_director.name;
 }
 
-async function hasPermissions(msg) {
-  const isAdmin = msg.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
-  const savedRoles = await getSavedRoles(msg)
-  const savedRolesID = savedRoles.map(role => role.id)
-  const userRoles = msg.member.roles.cache.map(role => role.id)
-  let hasRolePermission = false
-  for(let savedRole of savedRolesID) {
-    if(userRoles.includes(savedRole)) {
-      hasRolePermission = true
-    }
-  }
-  return hasRolePermission || isAdmin
-}
-
 function joinTextWithIndex(moviesText) {
   let text = ''
   moviesText.forEach((movie, index) => {
@@ -112,7 +96,6 @@ function serverRoles(server) {
 module.exports = {
   COMMAND_REGEX,
   getMovieID,
-  hasPermissions,
   lineCount, 
   formatMovieText,
   numberLineFromMessage,
