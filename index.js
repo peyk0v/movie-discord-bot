@@ -1,6 +1,6 @@
 require('dotenv').config()
 const { Client, Intents, MessageEmbed } = require("discord.js")
-const { CREATE_FILE_REGEX, ADD_MOVIE_REGEX, DELETE_MOVIE_REGEX, EDIT_MOVIE_REGEX, hasPermissions, LIST_ROLES, ADD_PERMISSION_ROLE, REMOVE_PERMISSION_ROLE } = require("./utils")
+const { COMMAND_REGEX, hasPermissions } = require("./utils")
 const { createEmptyFile, addMovie, editMovie, deleteMovie, listRoles, addPermisionRole, removePermissionRole } = require('./commandHandlers')
 const openDatabaseConection = require('./db/mongoose')
 
@@ -24,17 +24,17 @@ client.on("messageCreate", msg => {
 client.on("messageCreate", (msg) => {
   if (msg.content.includes("testing")) {
     //console.log(msg.member.roles.cache.hasAny())
-  } else if (msg.content.match(ADD_MOVIE_REGEX) && hasPermissions(msg)) {
+  } else if (msg.content.match(COMMAND_REGEX.ADD_MOVIE) && hasPermissions(msg)) {
     addMovie(msg)
-  } else if (msg.content.match(EDIT_MOVIE_REGEX) && hasPermissions(msg)) {
+  } else if (msg.content.match(COMMAND_REGEX.EDIT_MOVIE) && hasPermissions(msg)) {
     editMovie(msg)
-  } else if (msg.content.match(DELETE_MOVIE_REGEX) && hasPermissions(msg)) {
+  } else if (msg.content.match(COMMAND_REGEX.DELETE_MOVIE) && hasPermissions(msg)) {
     deleteMovie(msg)
-  } else if(msg.content.match(LIST_ROLES) && hasPermissions(msg)) {
+  } else if(msg.content.match(COMMAND_REGEX.LIST_ROLES) && hasPermissions(msg)) {
     listRoles(msg)
-  } else if(msg.content.match(ADD_PERMISSION_ROLE) && hasPermissions(msg)) {
+  } else if(msg.content.match(COMMAND_REGEX.ADD_PERMISSION_ROLE) && hasPermissions(msg)) {
     addPermisionRole(msg)
-  } else if(msg.content.match(REMOVE_PERMISSION_ROLE) && hasPermissions(msg)) {
+  } else if(msg.content.match(COMMAND_REGEX.REMOVE_PERMISSION_ROLE) && hasPermissions(msg)) {
     removePermissionRole(msg)
   }
 });

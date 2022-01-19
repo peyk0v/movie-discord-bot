@@ -1,15 +1,16 @@
 const { Permissions } = require('discord.js');
 const ParseURLException = require('./exceptions/parseUrlException')
 const { getSavedRoles } = require('./db/db_helpers');
-const { find } = require('./db/schemas/movie');
 
-const ADD_MOVIE_REGEX = /^!addMovie\ +[^0-9][^\ ]*$/im;
-const EDIT_MOVIE_REGEX = /^!editMovie\ +[0-9]+\ +[^\ ]*$/im;
-const DELETE_MOVIE_REGEX = /^!deleteMovie\ +[0-9]+$/im;
-const CREATE_FILE_REGEX = /^!createEmptyFile\ */im;
-const LIST_ROLES = /^!listRoles\ */im
-const ADD_PERMISSION_ROLE = /^!addPermissionRole\ +[0-9]+$/im
-const REMOVE_PERMISSION_ROLE = /^!removePermissionRole\ +[0-9]+$/im
+const COMMAND_REGEX = {
+  ADD_MOVIE: /^!addMovie\ +[^0-9][^\ ]*$/im,
+  EDIT_MOVIE: /^!editMovie\ +[0-9]+\ +[^\ ]*$/im,
+  DELETE_MOVIE: /^!deleteMovie\ +[0-9]+$/im,
+  CREATE_FILE: /^!createEmptyFile\ */im,
+  LIST_ROLES: /^!listRoles\ */im,
+  ADD_PERMISSION_ROLE: /^!addPermissionRole\ +[0-9]+$/im,
+  REMOVE_PERMISSION_ROLE: /^!removePermissionRole\ +[0-9]+$/im
+}
 
 const ACTION = {
   ADD: Symbol('ADD'),
@@ -109,13 +110,7 @@ function serverRoles(server) {
 }
 
 module.exports = {
-  ADD_MOVIE_REGEX,
-  EDIT_MOVIE_REGEX,
-  DELETE_MOVIE_REGEX,
-  CREATE_FILE_REGEX,
-  LIST_ROLES,
-  ADD_PERMISSION_ROLE,
-  REMOVE_PERMISSION_ROLE,
+  COMMAND_REGEX,
   getMovieID,
   hasPermissions,
   lineCount, 
