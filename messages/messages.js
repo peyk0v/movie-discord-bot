@@ -27,7 +27,7 @@ function addFailureMessage(msg, text) {
     color: 0xff0000,
     description: 'Error: ' + text
   }
-  msg.channel.send({embeds: [embed]}).then( _msg => {
+  msg.channel.send({ embeds: [embed] }).then( _msg => {
     msg.delete()
     setTimeout(() => {_msg.delete()}, 10000)
   })
@@ -47,19 +47,18 @@ function createEmbed(msg, movieData) {
 
   const embed = new MessageEmbed()
 	  .setColor('#548f6f')
-	  .setTitle(movieData.title)
+	  .setTitle('\`' + movieData.title + '\`')
 	  .setAuthor({ name: movieData.main_director.name, iconURL: movieData.main_director.image, url:  movieData.main_director.image})
-	  .setDescription('última peli vista')
+	  .setDescription('_*Última película vista*_')
 	  .setThumbnail(movieData.image_url)
 	  .addFields(
       { name: '\u200B', value: '\u200B' },
+	  	{ name: 'Director/s', value: movieData.directors.join(', ') },
 	  	{ name: 'Genres', value: movieData.genres.join(', ') },
-	  	{ name: 'director/s', value: movieData.directors.join(', '), inline: true },
-	  	{ name: 'release date', value: movieData.release_date, inline: true },
-      { name: 'vote average', value: movieData.vote_average.toString(), inline: true }
+	  	{ name: 'Release Date', value: movieData.release_date, inline: true },
+      { name: 'Vote Average', value: movieData.vote_average.toString(), inline: true }
 	  )
-	  .addField('Inline field title', 'Some value here', true)
-	  .setImage(movieData.image_url)
+	  //.setImage(movieData.image_url)
 	  .setTimestamp()
 	  .setFooter({ text: msg.member.displayName, iconURL: msg.author.avatarURL() });
 
@@ -80,20 +79,20 @@ function formatRolesText(serverRoles, savedRoles) {
 }
 
 function createRoleEmbedText(msg, rolesText) {
-  const text = 'Los roles tachados no pueden utilizar el bot: \n'
+  const text = 'Los roles que figuran tachado no pueden hacer uso del bot: \n'
     + '\n'
     + rolesText
     + '\n'
-    + '\n Para agregar permisos de uso a un rol: !addPermissionRole ***NUMERO***'
-    + '\n Para remover permisos de uso a un rol: !removePermissionRole ***NUMERO***'
+    + '\n Para agregar permisos de uso a un rol: _!addPermissionRole_ ***NUMERO***'
+    + '\n Para remover permisos de uso a un rol: _!removePermissionRole_ ***NUMERO***'
   
   msg.channel.send({ embeds: [{ color: 0x548f6f, description: text }] })
 }
 
 function sendFinalMsg(message, movieData) {
   const embed = createEmbed(message, movieData);
-  const text = '\*\*\*movie\*\*\*'
-  return message.channel.send({content: text, embeds: [embed], files: ["movie_file/movies.txt"] });
+  const text = '***Lista de películas vistas***'
+  return message.channel.send({ content: text, embeds: [embed], files: ["movie_file/movies.glsl"] });
 }
 
 module.exports = {
