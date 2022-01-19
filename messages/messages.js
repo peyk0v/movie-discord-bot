@@ -1,16 +1,20 @@
 const { MessageEmbed } = require('discord.js')
 const { ACTION } = require('../utils')
 
-function addSuccessMessage(msg, movie, action) {
+function addSuccessMessage(msg, data, action) {
   const embed = { color: 0x548f6f }
   if(action === ACTION.ADD) {
-    embed.description = `Se agregó \_\_${movie.title}\_\_ correctamente`
-  } else if (action === ACTION.EDIT) {
-    embed.description = `Nueva película \_\_${movie.title}\_\_ se editó correctamente`
-  } else if (action === ACTION.DELETE) {
+    embed.description = `Se agregó \_\_${data.title}\_\_ correctamente`
+  } else if(action === ACTION.EDIT) {
+    embed.description = `Nueva película \_\_${data.title}\_\_ se editó correctamente`
+  } else if(action === ACTION.DELETE) {
     embed.description = `La película fue eliminada correctamente`
-  } else if (action === ACTION.CREATE_BASE) {
+  } else if(action === ACTION.CREATE_BASE) {
     embed.description = `Archivo base creado correctamente`
+  } else if(action === ACTION.ADD_ROLE) {
+    embed.description = `Rol: ${data.title} agregado correctamente`
+  } else if(action === ACTION.REMOVE_ROLE) {
+    embed.description = `Rol: ${data.title} fue removido correctamente`
   }
   msg.channel.send({embeds: [embed]}).then( _msg => {
     msg.delete()
@@ -62,17 +66,28 @@ function createEmbed(msg, movieData) {
   return embed
 }
 
-function createRolesText(roles) {
-  //[{name, id, index}]
-  let text = 'Los roles disponibles son los siguientes: \n'
-  for(let role of roles) {
-    text = text.concat('***' + role.index + '***' + ' ' + role.name + '\n')
+function formatRolesText(serverRoles, savedRoles) {
+  const savedRolesId = savedRoles.map(role => role.id)
+  let rolesText = []
+  for(let role of serverRoles) {
+    if(savedRolesId.includes(role.id)) {
+      rolesText.push('***' + role.index + '***' + ' - ' + role.name) 
+    } else {
+      rolesText.push('***' + role.index + '***' + ' - ' + '~~' + role.name + '~~')
+    }
   }
-  text = text.concat(
-    '\n Para agregar un rol que pueda manejar el bot use !addPermissionRole ***NUMERO***'
-    + '\n Para remover un rol que pueda manejar el bot use !removePermissionRole ***NUMERO***'
-    )
-  return text
+  return rolesText.join('\n')
+}
+
+function createRoleEmbedText(msg, rolesText) {
+  const text = 'Los roles tachados no pueden utilizar el bot: \n'
+    + '\n'
+    + rolesText
+    + '\n'
+    + '\n Para agregar permisos de uso a un rol: !addPermissionRole ***NUMERO***'
+    + '\n Para remover permisos de uso a un rol: !removePermissionRole ***NUMERO***'
+  
+  msg.channel.send({ embeds: [{ color: 0x548f6f, description: text }] })
 }
 
 function sendFinalMsg(message, movieData) {
@@ -85,6 +100,7 @@ module.exports = {
   addSuccessMessage,
   addFailureMessage,
   createTemporaryMessage,
-  createRolesText,
+  formatRolesText,
+  createRoleEmbedText,
   sendFinalMsg
 }

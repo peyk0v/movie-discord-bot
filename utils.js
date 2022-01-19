@@ -1,5 +1,7 @@
 const { Permissions } = require('discord.js');
 const ParseURLException = require('./exceptions/parseUrlException')
+const { getSavedRoles } = require('./db/db_helpers');
+const { find } = require('./db/schemas/movie');
 
 const ADD_MOVIE_REGEX = /^!addMovie\ +[^0-9][^\ ]*$/im;
 const EDIT_MOVIE_REGEX = /^!editMovie\ +[0-9]+\ +[^\ ]*$/im;
@@ -13,7 +15,11 @@ const ACTION = {
   ADD: Symbol('ADD'),
   EDIT: Symbol('EDIT'),
   DELETE: Symbol('DELETE'),
-  CREATE_BASE: Symbol('CREATE_BASE')
+  CREATE_BASE: Symbol('CREATE_BASE'),
+  ADD_ROLE: Symbol('ADD_ROLE'),
+  REMOVE_ROLE: Symbol('REMOVE_ROLE'),
+  LIST_SERVER_ROLES: Symbol('LIST_SERVER_ROLES'),
+  LIST_SAVED_ROLES: Symbol('LIST_SAVED_ROLES')
 }
 
 function getMovieID(commandLine) {
@@ -69,8 +75,18 @@ function formatMovieText(movieData) {
   return movieData.title + " " + "(" + year + ")" + " - " + movieData.main_director.name;
 }
 
-function hasPermissions(member) {
-  return member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
+async function hasPermissions(msg) {
+  const isAdmin = msg.member.permissions.has(Permissions.FLAGS.ADMINISTRATOR)
+  const savedRoles = await getSavedRoles(msg)
+  const savedRolesID = savedRoles.map(role => role.id)
+  const userRoles = msg.member.roles.cache.map(role => role.id)
+  let hasRolePermission = false
+  for(let savedRole of savedRolesID) {
+    if(userRoles.includes(savedRole)) {
+      hasRolePermission = true
+    }
+  }
+  return hasRolePermission || isAdmin
 }
 
 function joinTextWithIndex(moviesText) {

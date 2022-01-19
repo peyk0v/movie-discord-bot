@@ -2,13 +2,14 @@ const getMovieData = require('./services/tmdb')
 const { addMovieToAttachedFile } = require('./messages/attachFile')
 const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
-const { saveRawData, updateRawData, deleteSelectedMovie } = require('./db/db_helpers')
+const { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles} = require('./db/db_helpers')
 const { overwritePreviousFile, createBaseFile, writeTextToFile } = require('./movie_file/file')
-const { sendFinalMsg, addFailureMessage, addSuccessMessage, createRolesText } = require('./messages/messages')
+const { sendFinalMsg, addFailureMessage, addSuccessMessage, formatRolesText, createRoleEmbedText } = require('./messages/messages')
 const {
   getMovieID,
   ACTION,
-  serverRoles
+  serverRoles,
+  numberLineFromMessage
 } = require('./utils')
 
 async function addMovie(msg) {
@@ -54,9 +55,48 @@ async function createEmptyFile(msg) {
 }
 
 async function listRoles(msg) {
+  try {
+    const roles = serverRoles(msg.guild)
+    const savedRoles = await getSavedRoles(msg)
+    const text = formatRolesText(roles, savedRoles)
+    createRoleEmbedText(msg, text)
+  } catch(error) {
+    addFailureMessage(msg, error.message)
+  }
+  
+}
+
+async function addPermisionRole(msg) {
+  try{
+    const data = getRoleData(msg)
+    await savePermissionRole(data, msg.guild.id)
+    addSuccessMessage(msg, {title: data.name}, ACTION.ADD_ROLE) 
+  } catch (error) {
+    addFailureMessage(msg, error.message)
+  }
+}
+
+async function removePermissionRole(msg) {
+  try {
+    const data = getRoleData(msg)
+    await deletePermissionRole(data, msg.guild.id)
+    addSuccessMessage(msg, { title: data.name }, ACTION.REMOVE_ROLE)
+  } catch (error) {
+    addFailureMessage(msg, error.message)
+  }
+}
+
+function getRoleData(msg) {
+  const roleNumber = numberLineFromMessage(msg.content)
   const roles = serverRoles(msg.guild)
-  const text = createRolesText(roles)
-  msg.channel.send({ embeds: [{ color: 0x548f6f, description: text }]})
+  if(roleNumber.isNaN() || roleNumber > roles.length || roleNumber <= 0) {
+    throw new Error('el numero de rol no es valido')
+  }
+  const data = roles.find(role => role.index == roleNumber)
+  if(!data) {
+    throw new Error('no se pudo encontrar el rol')
+  }
+  return data
 }
 
 async function getData(content) {
@@ -77,4 +117,4 @@ async function updateServerData(msg, data, result, action) {
   }
 }
 
-module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile, listRoles };
+module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile, listRoles, addPermisionRole, removePermissionRole };

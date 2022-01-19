@@ -1,7 +1,7 @@
 const Movie = require('./schemas/movie')
 const DBException = require('../exceptions/dbException')
 const { formatMovieText, numberLineFromMessage } = require('../utils')
-const { saveMovie, getAllMovies, updateMovie, deleteMovie } = require('./dbEntries')
+const { saveMovie, getAllMovies, updateMovie, deleteMovie, saveRole, deleteRole, getAllRoles } = require('./dbEntries')
 
 async function saveRawData(movieData, msg) {
   try {
@@ -59,6 +59,24 @@ function getDesireData(content, movies) {
   return { data: movies[line - 1], line: line } 
 }
 
+async function savePermissionRole(role, serverID) {
+  const data = { name: role.name, id: role.id, server_id: serverID }
+  await saveRole(data)
+}
+
+async function deletePermissionRole(role, serverID) {
+  const filter = { name: role.name, id: role.id, server_id: serverID }
+  await deleteRole(filter)
+}
+
+async function getSavedRoles(msg) {
+  try {
+    return await getAllRoles(msg.guild.id)
+  } catch(error) {
+    throw error
+  }
+}
+
 function adaptDataToSchema(movieData, serverId) {
   const text = formatMovieText(movieData);
   const newMovie = {
@@ -81,4 +99,4 @@ function fieldsToUpdate(movieData) {
   return newMovie
 }
 
-module.exports = { saveRawData, updateRawData, deleteSelectedMovie }
+module.exports = { saveRawData, updateRawData, deleteSelectedMovie, savePermissionRole, deletePermissionRole, getSavedRoles }

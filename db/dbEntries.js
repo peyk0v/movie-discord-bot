@@ -1,11 +1,11 @@
 const Movie = require('./schemas/movie')
+const Role = require('./schemas/role')
 const DBException = require('../exceptions/dbException')
 
 async function saveMovie(movieData) {
   try {
     const newMovie = new Movie(movieData)
-    const response = await newMovie.save()
-    return response
+    return await newMovie.save()
   } catch {
     throw new DBException(`no se pudo guardar ${movieData.title}`)
   }
@@ -35,4 +35,29 @@ async function deleteMovie(filter) {
   }
 }
 
-module.exports = { saveMovie, getAllMovies, updateMovie, deleteMovie }
+async function saveRole(role) {
+  try {
+    const newRole = new Role(role)
+    return await newRole.save()
+  } catch {
+    throw new DBException(`no se pudo guardar el rol ${role.name}`)
+  }
+}
+
+async function deleteRole(filter) {
+  try {
+    return await Role.deleteOne(filter)
+  } catch {
+    throw new DBException(`error al remover el rol`)
+  }
+}
+
+async function getAllRoles(serverID) {
+  try {
+    return await Role.find({ server_id: serverID }) 
+  } catch {
+    throw new DBException(`error al buscar las peliculas pertenecientes al server`)
+  }
+}
+
+module.exports = { saveMovie, getAllMovies, updateMovie, deleteMovie, saveRole, deleteRole, getAllRoles }
