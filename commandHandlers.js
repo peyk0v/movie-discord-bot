@@ -54,7 +54,7 @@ async function createEmptyFile(msg) {
       throw new BaseFileExistsException()
     }
     writeTextToFile('(∩ᵔ-ᵔ)⊃━☆ﾟ.mOvIeS: eMpTy*･｡ﾟ')
-    await msg.channel.send({ content:'***movies***', files: ['./movie_file/movies.txt']  })
+    await msg.channel.send({ content:'***movies***', files: ['./movie_file/movies.glsl']  })
     addSuccessMessage(msg, {title: 'none'} , ACTION.CREATE_BASE)    
   } catch (error) {
     addFailureMessage(msg, error.message)
@@ -98,7 +98,7 @@ async function removePermissionRole(msg) {
 function getRoleData(msg) {
   const roleNumber = numberLineFromMessage(msg.content)
   const roles = serverRoles(msg.guild)
-  if(roleNumber.isNaN() || roleNumber > roles.length || roleNumber <= 0) {
+  if(isNaN(roleNumber) || roleNumber > roles.length || roleNumber <= 0) {
     throw new Error('el numero de rol no es valido')
   }
   const data = roles.find(role => role.index == roleNumber)

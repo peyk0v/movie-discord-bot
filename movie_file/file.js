@@ -4,7 +4,7 @@ const { ACTION, joinTextWithIndex } = require('../utils')
 
 function readTextFromFile() {
   try {
-    const data = fs.readFileSync('movies.txt', 'utf8')
+    const data = fs.readFileSync('movies.glsl', 'utf8')
     return data.toString()
   } catch (err) {
     console.error(err)
@@ -14,7 +14,7 @@ function readTextFromFile() {
 
 function createBaseFile() {
   try {
-    fs.closeSync(fs.openSync('./movie_file/movies.txt', 'w'))
+    fs.closeSync(fs.openSync('./movie_file/movies.glsl', 'w'))
   } catch {
     throw new CreateBaseFileException() 
   }
@@ -35,7 +35,7 @@ async function overwritePreviousFile(movieObj, action) {
 
 function writeTextToFile(text) {
   try {
-    fs.writeFileSync('movie_file/movies.txt', text, 'utf-8')
+    fs.writeFileSync('movie_file/movies.glsl', text, 'utf-8')
   } catch {
     throw new WriteFileException()
   }
