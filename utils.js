@@ -25,8 +25,8 @@ function getMovieID(commandLine) {
   const singleSpaceText = eliminateSpaces(commandLine)
   try {
     const movieURI = singleSpaceText.split(/\/movie\//im)[1];
-    const movieID = movieURI.split(/-/)[0]
-    if(isNaN(movieID)){
+		const movieID = movieURI.split(/[^0-9]./)[0]
+    if(!movieID || isNaN(movieID)){
       throw new ParseURLException('la url debe terminar con el siguiente formato .../movie/\*\*\*NUMERO\*\*\*-nombre-peli')
     } else {
       return movieID
