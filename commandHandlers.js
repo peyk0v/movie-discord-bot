@@ -4,7 +4,7 @@ const { BaseFileExistsException } = require('./exceptions/fileException')
 const { movieFileAlreadyExits, updateAttachMsg } = require('./messages/attachFile')
 const { overwritePreviousFile, writeTextToFile } = require('./movie_file/file')
 const { getMovieID, ACTION, serverRoles, numberLineFromMessage } = require('./utils')
-const { addFailureMessage, addSuccessMessage, formatRolesText, createRoleEmbedText } = require('./messages/messages')
+const { addFailureMessage, addSuccessMessage, formatRolesText, createRoleEmbedText, formatListCommandText } = require('./messages/messages')
 const { 
   saveRawData, 
   updateRawData, 
@@ -95,6 +95,13 @@ async function removePermissionRole(msg) {
   }
 }
 
+function listCommands(msg) {
+	const text = formatListCommandText()
+	const title = 'Lista de comandos: '
+	const embed = { color: 0x548f6f, title: title, description: text }
+	msg.channel.send({ embeds: [embed] })
+} 
+
 function getRoleData(msg) {
   const roleNumber = numberLineFromMessage(msg.content)
   const roles = serverRoles(msg.guild)
@@ -134,4 +141,4 @@ async function checkForPermissions(msg) {
   }
 }
 
-module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile, listRoles, addPermisionRole, removePermissionRole };
+module.exports = { addMovie, editMovie, deleteMovie, createEmptyFile, listRoles, addPermisionRole, removePermissionRole, listCommands };

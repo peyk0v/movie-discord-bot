@@ -1,4 +1,5 @@
-const { MessageEmbed } = require('discord.js')
+const { MessageEmbed } = require('discord.js');
+const { count } = require('../db/schemas/movie');
 const { ACTION } = require('../utils')
 
 function addSuccessMessage(msg, data, action) {
@@ -103,11 +104,34 @@ function sendFinalMsg(message, movieData) {
   return message.channel.send({ content: text, embeds: [embed], files: ["movie_file/movies.glsl"] });
 }
 
+function formatListCommandText() {
+	const scroll = ':scroll: '
+	const roles = ':passport_control: '
+	const admit = ':unlock: '
+	const denied = ':lock: '
+	const clapper = ':clapper: '
+
+	return scroll + '**!createEmptyFile** _Crea una lista vacia de películas (solo se usa la primera vez)_\n'
+		+ '\n'
+		+	clapper + '**!addMovie link** _Agrega una película a la lista_\n'
+		+ '\n'
+		+	clapper + '**!deleteMovie numero** _Elimina la pelicula que se encuentra en la linea __numero__ _\n'
+		+ '\n'
+		+ clapper + '**!editMovie numero link** _Reemplaza la película __**numero**__ por la que se encuentra en __**link**___\n'
+		+ '\n'
+		+	roles + '**!listRoles** _Lista los roles del servidor para agregar/remover permisos_\n'
+		+ '\n'
+		+	admit + '**!addPermissionRole numero** _Permite que el rol __**numero**__ pueda usar el bot_\n'
+		+ '\n'
+		+	denied + '**!removePermissionRole numero** _Remueve los permisos del rol __**numero**___'
+}
+
 module.exports = {
   addSuccessMessage,
   addFailureMessage,
   createTemporaryMessage,
   formatRolesText,
   createRoleEmbedText,
-  sendFinalMsg
+  sendFinalMsg,
+	formatListCommandText
 }

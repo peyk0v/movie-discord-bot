@@ -7,7 +7,8 @@ const COMMAND_REGEX = {
   CREATE_FILE: /^!createEmptyFile\ */im,
   LIST_ROLES: /^!listRoles\ */im,
   ADD_PERMISSION_ROLE: /^!addPermissionRole\ +[0-9]+$/im,
-  REMOVE_PERMISSION_ROLE: /^!removePermissionRole\ +[0-9]+$/im
+  REMOVE_PERMISSION_ROLE: /^!removePermissionRole\ +[0-9]+$/im,
+	SEE_COMMANDS: /^!moviebot\ */im
 }
 
 const ACTION = {
