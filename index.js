@@ -9,7 +9,8 @@ const {
   deleteMovie, 
   listRoles, 
   addPermisionRole, 
-  removePermissionRole 
+  removePermissionRole,
+	listCommands
 } = require('./commandHandlers')
 
 
@@ -25,6 +26,7 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", (msg) => {
+	if(msg.member.user.bot) return;
   if(msg.content.match(COMMAND_REGEX.CREATE_FILE)) {
     createEmptyFile(msg)
   } else if (msg.content.match(COMMAND_REGEX.ADD_MOVIE)) {
@@ -39,5 +41,7 @@ client.on("messageCreate", (msg) => {
     addPermisionRole(msg)
   } else if(msg.content.match(COMMAND_REGEX.REMOVE_PERMISSION_ROLE)) {
     removePermissionRole(msg)
-  }
+  } else if (msg.content.match(COMMAND_REGEX.SEE_COMMANDS)) {
+		listCommands(msg)
+	}
 });

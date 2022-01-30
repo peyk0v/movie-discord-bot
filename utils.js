@@ -7,7 +7,8 @@ const COMMAND_REGEX = {
   CREATE_FILE: /^!createEmptyFile\ */im,
   LIST_ROLES: /^!listRoles\ */im,
   ADD_PERMISSION_ROLE: /^!addPermissionRole\ +[0-9]+$/im,
-  REMOVE_PERMISSION_ROLE: /^!removePermissionRole\ +[0-9]+$/im
+  REMOVE_PERMISSION_ROLE: /^!removePermissionRole\ +[0-9]+$/im,
+	SEE_COMMANDS: /^!moviebot\ */im
 }
 
 const ACTION = {
@@ -25,8 +26,8 @@ function getMovieID(commandLine) {
   const singleSpaceText = eliminateSpaces(commandLine)
   try {
     const movieURI = singleSpaceText.split(/\/movie\//im)[1];
-    const movieID = movieURI.split(/-/)[0]
-    if(isNaN(movieID)){
+		const movieID = movieURI.split(/[^0-9]./)[0]
+    if(!movieID || isNaN(movieID)){
       throw new ParseURLException('la url debe terminar con el siguiente formato .../movie/\*\*\*NUMERO\*\*\*-nombre-peli')
     } else {
       return movieID
