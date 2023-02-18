@@ -27,7 +27,7 @@ function addSuccessMessage(msg, data, action) {
 
 	msg.channel.send({embeds: [embed]}).then( _msg => {
     msg.delete()
-    setTimeout(() => {_msg.delete()}, 10000)
+    setTimeout(() => {_msg.delete()}, 2000)
 	})
 }
 
