@@ -1,6 +1,8 @@
 # Discord BOT - Movie list
 ![image_presentation](https://github.com/NPeykov/movie-discord-bot/blob/main/presentation_files/movie-list-image.png)
 
+![gif_presentation](https://github.com/NPeykov/movie-discord-bot/blob/main/presentation_files/first-steps.gif)
+
 ## Introduction
 
 The main purpose of this bot was to give me an excuse to make an approach to the world of Discord bots. Therefore, its purpose and usefulness are limited, nevertheless, in some concrete cases it can be useful.
